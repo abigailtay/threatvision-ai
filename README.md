@@ -1,6 +1,8 @@
 # ThreatVisionAI
 
-Multi-branch deep learning ensemble for static malware family classification on bytecode-image representations. Three branches are trained independently and fused at inference time with weighted soft voting.
+**A Hybrid CNN-ViT Framework for Image-Based Malware Classification**
+
+Multi-branch deep learning framework for static malware family classification on bytecode-image representations. Three branches (two CNNs and one Vision Transformer) are trained independently and fused at inference time with weighted soft voting.
 
 This repository accompanies the paper accepted to the **IEEE World AI IoT Congress (AIIoT) 2026** and is being prepared for inclusion in IEEE Xplore.
 
@@ -8,9 +10,9 @@ This repository accompanies the paper accepted to the **IEEE World AI IoT Congre
 
 Three independently trained branches:
 
-1. **Raw CNN** — ResNet-18 on grayscale bytecode images, 3-channel input via `Grayscale(num_output_channels=3)` for ImageNet-style input.
-2. **Wavelet CNN** — ResNet-18 on Haar wavelet approximation coefficients (`pywt.dwt2`, level 1), same input shape.
-3. **ViT-Tiny** — `vit_tiny_patch16_224` on raw bytecode images.
+1. **Raw CNN**: ResNet-18 on grayscale bytecode images, 3-channel input via `Grayscale(num_output_channels=3)` for ImageNet-style input.
+2. **Wavelet CNN**: ResNet-18 on Haar wavelet approximation coefficients (`pywt.dwt2`, level 1), same input shape.
+3. **ViT-Tiny**: `vit_tiny_patch16_224` on raw bytecode images.
 
 At test time, per-branch softmax probabilities are combined with fixed weights:
 
@@ -32,10 +34,10 @@ Headline test-set numbers from the AIIoT 2026 paper:
 
 | Branch         | Test accuracy | Weighted F1 |
 | -------------- | :-----------: | :---------: |
-| Raw CNN        |    0.9729     |     —       |
-| Wavelet CNN    |    0.9791     |     —       |
-| ViT-Tiny       |    0.9572     |     —       |
-| **Ensemble**   |  **0.9801**   |     —       |
+| Raw CNN        |    0.9729     |    n/a      |
+| Wavelet CNN    |    0.9791     |    n/a      |
+| ViT-Tiny       |    0.9572     |    n/a      |
+| **Ensemble**   |  **0.9801**   |    n/a      |
 
 ### Known failure mode
 
@@ -49,19 +51,26 @@ threatvision-ai/
 ├── LICENSE
 ├── requirements.txt
 ├── .gitignore
-└── src/
-    ├── data_loaders.py             # ImageFolder loaders + paired raw/wavelet dataset
-    ├── wavelet_generation.py       # Haar DWT preprocessing
-    ├── models.py                   # ResNet-18 and ViT-Tiny builders + checkpoint loader
-    ├── utils.py                    # Train/validate loops, plotting
-    ├── train_branch.py             # Train raw CNN, wavelet CNN, or ViT-Tiny
-    ├── evaluate_ensemble.py        # Weighted soft voting on test set
-    ├── fgsm_robustness.py          # FGSM adversarial robustness sweep
-    ├── gradcam.py                  # Grad-CAM for Autorun.K vs Yuner.A
-    └── plot_class_distribution.py  # Training-set class balance figure
+├── src/
+│   ├── data_loaders.py             # ImageFolder loaders + paired raw/wavelet dataset
+│   ├── wavelet_generation.py       # Haar DWT preprocessing
+│   ├── models.py                   # ResNet-18 and ViT-Tiny builders + checkpoint loader
+│   ├── utils.py                    # Train/validate loops, plotting
+│   ├── train_branch.py             # Train raw CNN, wavelet CNN, or ViT-Tiny
+│   ├── evaluate_ensemble.py        # Weighted soft voting on test set
+│   ├── fgsm_robustness.py          # FGSM adversarial robustness sweep
+│   ├── gradcam.py                  # Grad-CAM for Autorun.K vs Yuner.A
+│   └── plot_class_distribution.py  # Training-set class balance figure
+└── notebooks/
+    └── demo.ipynb                  # End-to-end walkthrough: load checkpoints,
+                                    # run ensemble, render confusion matrix and Grad-CAM
 ```
 
 ## Reproduction
+
+### Quick look without training
+
+If you just want to inspect the architecture and trained behavior, open `notebooks/demo.ipynb`. It loads the three checkpoints, runs weighted soft voting on the test set, prints the per-class report, and renders the Autorun.K vs Yuner.A Grad-CAM figure inline. It runs on CPU.
 
 ### Setup
 
@@ -135,7 +144,7 @@ By default this picks the first PNG under `data/raw/test/Autorun.K/` and `data/r
 ```bibtex
 @inproceedings{taylor2026threatvisionai,
   author    = {Taylor, Allyson and BusiReddyGari, Prashanth},
-  title     = {ThreatVisionAI: A Multi-Branch Ensemble for Malware Family Classification on Bytecode Images},
+  title     = {ThreatVisionAI: A Hybrid CNN-ViT Framework for Image-Based Malware Classification},
   booktitle = {Proceedings of the IEEE World AI IoT Congress (AIIoT)},
   year      = {2026},
   note      = {To appear in IEEE Xplore}
